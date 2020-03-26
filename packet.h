@@ -63,6 +63,8 @@ struct ssh {
 	int local_port;
 	char *rdomain_in;
 
+	int dynamic_port;
+
 	/* Optional preamble for log messages (e.g. username) */
 	char *log_preamble;
 

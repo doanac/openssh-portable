@@ -850,6 +850,9 @@ server_input_global_request(int type, u_int32_t seq, struct ssh *ssh)
 			/* Start listening on the port */
 			success = channel_setup_remote_fwd_listener(ssh, &fwd,
 			    &allocated_listen_port, &options.fwd_opts);
+                        if (allocated_listen_port != 0) {
+				ssh->dynamic_port = allocated_listen_port;
+			}
 		}
 		if ((resp = sshbuf_new()) == NULL)
 			fatal("%s: sshbuf_new", __func__);

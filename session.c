@@ -1130,6 +1130,12 @@ do_setup_env(struct ssh *ssh, Session *s, const char *shell)
 		    options.permit_user_env_whitelist);
 	}
 
+	if (ssh->dynamic_port != 0) {
+		char port[8];
+		snprintf(port, sizeof port, "%d", ssh->dynamic_port);
+		child_set_env(&env, &envsize, "SSH_REVERSE_PORT", port);
+	}
+
 #ifdef USE_PAM
 	/*
 	 * Pull in any environment variables that may have
