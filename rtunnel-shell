@@ -1,0 +1,14 @@
+#!/bin/sh -e
+
+[ -d /devices ] || mkdir /devices
+
+cat > /devices/$1 <<EOF
+#!/bin/sh
+
+exec ssh -p$SSH_REVERSE_PORT fio@localhost \$*
+EOF
+chmod +x /devices/$1
+
+trap "rm /devices/$1" EXIT TERM KILL
+echo "entering infinite sleep loop"
+while true; do sleep 10000; done
