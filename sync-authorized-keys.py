@@ -14,6 +14,12 @@ logging.basicConfig(
 
 TWENTY_MINUTES = 20 * 60
 TOKEN = sys.argv[1]
+FACTORY = None
+try:
+    FACTORY = sys.argv[2]
+    logging.info("Devices limited to factory: %s", FACTORY)
+except IndexError:
+    pass
 HOME = Path.home()
 
 
@@ -27,8 +33,11 @@ def sync(token):
     headers = {"OSF-TOKEN": token}
 
     with open("/tmp/authorized_keys", "w") as f:
-        url = "https://api.foundries.io/ota/devices/"
-        url += "?shared=1&pubkey_format=OpenSSH"
+        url = "https://api.foundries.io/ota/devices/?pubkey_format=OpenSSH"
+        if FACTORY:
+            url += "&factory=" + FACTORY
+        else:
+            url += "&shared=1"
         while url:
             r = requests.get(url, headers=headers)
             if r.status_code != 200:

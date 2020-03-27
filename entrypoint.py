@@ -10,6 +10,9 @@ if len(sys.argv) != 2:
 if os.fork() == 0:
     # child - check keys forever
     args = ["/sync-authorized-keys", sys.argv[1]]
+    factory = os.environ.get("FACTORY")
+    if factory:
+        args.append(factory)
     os.execv(args[0], args)
 
 args = ["/usr/local/sbin/sshd", "-D", "-p", "2222", "-E", "/dev/stderr"]
