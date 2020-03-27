@@ -24,21 +24,23 @@ def sync(token):
         logging.warning("Creating ssh config directory: %s", sshdir)
         sshdir.mkdir()
 
-    # TODO pagination
     headers = {"OSF-TOKEN": token}
-    params = {"pubkey_format": "OpenSSH", "shared": "1"}
-    r = requests.get(
-        "https://api.foundries.io/ota/devices/",
-        headers=headers,
-        params=params)
-    if r.status_code != 200:
-        logging.error("Unable to get fleet public keys - HTTP_%d:\n%s",
-                      r.status_code, r.text)
+
     with open("/tmp/authorized_keys", "w") as f:
-        for d in r.json()["devices"]:
-            pub = d.get('public-key')
-            if pub:
-                f.write('command="/rtunnel-shell %s" %s\n' % (d['name'], pub))
+        url = "https://api.foundries.io/ota/devices/"
+        url += "?shared=1&pubkey_format=OpenSSH"
+        while url:
+            r = requests.get(url, headers=headers)
+            if r.status_code != 200:
+                logging.error("Unable to get fleet public keys - HTTP_%d:\n%s",
+                              r.status_code, r.text)
+                return
+            for d in r.json()["devices"]:
+                pub = d.get('public-key')
+                if pub:
+                    f.write('command="/rtunnel-shell %s" %s\n' % (
+                        d['name'], pub))
+            url = r.json().get('next')
     os.rename("/tmp/authorized_keys", sshdir / "authorized_keys")
 
 
