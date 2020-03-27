@@ -26,9 +26,11 @@ def sync(token):
 
     # TODO pagination
     headers = {"OSF-TOKEN": token}
+    params = {"pubkey_format": "OpenSSH", "shared": "1"}
     r = requests.get(
-        "https://api.foundries.io/ota/devices/?pubkey_format=OpenSSH",
-        headers=headers)
+        "https://api.foundries.io/ota/devices/",
+        headers=headers,
+        params=params)
     if r.status_code != 200:
         logging.error("Unable to get fleet public keys - HTTP_%d:\n%s",
                       r.status_code, r.text)
